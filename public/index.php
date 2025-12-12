@@ -52,6 +52,31 @@ switch ($controller) {
                 break;
         }
         break;
+        
+    case 'Post': // CORRECTION 3.1: Ajout du contrôleur Post
+        $postController = new PostController();
+        switch ($action) {
+            case 'lister':
+            case 'index':
+                $postController->lister();
+                break;
+            case 'creer':
+                $postController->creer();
+                break;
+            case 'enregistrer':
+                $postController->enregistrer();
+                break;
+            case 'modifier':
+                $postController->modifier($id);
+                break;
+            case 'supprimer':
+                $postController->supprimer($id);
+                break;
+            default:
+                $postController->lister();
+                break;
+        }
+        break;
     
         // case 'Commentaires':
         //     $commentaireController = new CommentaireController();

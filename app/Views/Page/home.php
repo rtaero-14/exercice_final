@@ -1,4 +1,4 @@
-<h1>Ceci est un réseau social !</h1>
+<h1>DeustaGramme</h1>
 
 <p>
     Vous voyez Instagram ? Bah c'est la même chose mais en moins bien, et pour une petite entreprise.<br/>
@@ -63,7 +63,6 @@
                         </form>
                     </div>
                 <?php endif; ?>
-
             </div>
         </div>
     </div>

@@ -17,12 +17,10 @@ if(!isset($_GET['c'])){
     $_GET['c'] = 'home';
 }
 
-// mise en place de la route actuelle
 $controller = isset($_GET['c']) ? $_GET['c'] : 'home';
 $action = isset($_GET['a']) ? $_GET['a'] : 'index';
 $id = isset($_GET['id']) ? $_GET['id'] : NULL;
 
-// définition des routes disponibles
 switch ($controller) {
     case 'home':
         $postModel = new Post();
@@ -85,6 +83,9 @@ switch ($controller) {
             case 'modifier':
                 $postController->modifier($id);
                 break;
+            case 'update':
+                $postController->update();
+                break;
             case 'supprimer':
                 $postController->supprimer($id);
                 break;
@@ -94,22 +95,18 @@ switch ($controller) {
         }
         break;
     
-        // case 'Comments':
-        //     $commentaireController = new CommentaireController();
-        //     switch ($action) {
-        //         case 'ajouter':
-        //             $commentaireController->ajouter($id);
-        //             break;
+    case 'Commentaires':
+        $commentaireController = new CommentController();
+        switch ($action) {
+            case 'ajouter':
+                $commentaireController->ajouter();
+                break;
 
-        //         case 'supprimer':
-        //             $commentaireController->supprimer($id);
-        //             break;
-
-        //         case 'listerTous':
-        //             $commentaireController->listerCommentaires();
-        //             break;
-        //     }
-        //     break;
+            case 'supprimer':
+                $commentaireController->supprimer($id);
+                break;
+        }
+        break;
     
     default:
         echo "Page non trouvée";

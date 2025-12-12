@@ -10,18 +10,21 @@
         <div class="card" data-post-id="<?php echo $post['id']; ?>">
             <div class="card-header d-flex justify-content-between">
                 <div>
-                    <strong><?php echo htmlspecialchars($post['titre']); ?></strong> 
+                    <strong class="post-titre-editable" data-id="<?php echo $post['id']; ?>" <?php echo (isset($_SESSION['id']) && $_SESSION['id'] == $post['utilisateur_id']) ? 'contenteditable="true"' : ''; ?>>
+                        <?php echo htmlspecialchars($post['titre']); ?>
+                    </strong>
                 </div>
                 <div>
                     Publié par <strong><?php echo htmlspecialchars($post['nom_utilisateur']); ?></strong> le <?php echo date('d/m/Y H:i', strtotime($post['date_publication'])); ?>
                 </div>
             </div>
             <div class="card-body">
-                <p class="card-text"><?php echo nl2br(htmlspecialchars($post['contenu'])); ?></p>
+                <p class="card-text post-contenu-editable" data-id="<?php echo $post['id']; ?>" <?php echo (isset($_SESSION['id']) && $_SESSION['id'] == $post['utilisateur_id']) ? 'contenteditable="true"' : ''; ?>>
+                    <?php echo nl2br(htmlspecialchars($post['contenu'])); ?>
+                </p>
                 
                 <?php if (isset($_SESSION['id']) && $_SESSION['id'] == $post['utilisateur_id']) : ?>
                     <hr>
-                    <a href="?c=Post&a=modifier&id=<?php echo $post['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="?c=Post&a=supprimer&id=<?php echo $post['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">Supprimer</a>
                 <?php endif; ?>
 
@@ -66,7 +69,69 @@
 
 <?php if (isset($_SESSION['id'])) : ?>
 <script>
+    function updatePostAjax(element, type) {
+        const postId = element.getAttribute('data-id');
+        
+        const card = element.closest('.card');
+        const titreElement = card.querySelector('.post-titre-editable');
+        const contenuElement = card.querySelector('.post-contenu-editable');
+
+        const titre = titreElement.textContent.trim();
+        const contenu = contenuElement.textContent.trim();
+
+        const initialTitre = titreElement.getAttribute('data-initial-titre') || titre;
+        const initialContenu = contenuElement.getAttribute('data-initial-contenu') || contenu;
+
+        if (titre === initialTitre && contenu === initialContenu) {
+            return; 
+        }
+
+        const formData = new FormData();
+        formData.append('id', postId);
+        formData.append('titre', titre);
+        formData.append('contenu', contenu);
+
+        fetch('?c=Post&a=update', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok || response.status === 302) {
+                alert("Post modifié avec succès (rechargement requis pour voir le message de session).");
+            } else {
+                 alert("Erreur lors de la mise à jour du post.");
+            }
+        })
+        .catch(error => {
+            console.error('Erreur AJAX post update:', error);
+            alert('Une erreur s\'est produite lors de la communication avec le serveur (Post Update).');
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        const editableElements = document.querySelectorAll('.post-titre-editable[contenteditable="true"], .post-contenu-editable[contenteditable="true"]');
+        
+        editableElements.forEach(element => {
+            if (element.classList.contains('post-titre-editable')) {
+                element.setAttribute('data-initial-titre', element.textContent.trim());
+            } else if (element.classList.contains('post-contenu-editable')) {
+                 element.setAttribute('data-initial-contenu', element.textContent.trim());
+            }
+            
+            element.addEventListener('blur', function() {
+                const type = element.classList.contains('post-titre-editable') ? 'titre' : 'contenu';
+                updatePostAjax(element, type);
+            });
+            
+            element.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey && element.classList.contains('post-titre-editable')) {
+                    e.preventDefault(); 
+                    element.blur(); 
+                }
+            });
+        });
+
+
         const commentForms = document.querySelectorAll('.form-add-comment');
 
         commentForms.forEach(form => {
@@ -120,7 +185,7 @@
                 })
                 .catch(error => {
                     console.error('Erreur de la requête Fetch:', error);
-                    alert('Une erreur s\'est produite lors de la communication avec le serveur.');
+                    alert('Une erreur s\'est produite lors de la communication avec le serveur (Comment).');
                 });
             });
         });

@@ -3,27 +3,34 @@
 require_once __DIR__ . '/../Model/Post.php';
 require_once __DIR__ . '/../Model/User.php';
 require_once __DIR__ . '/../Model/Comment.php';
+require_once __DIR__ . '/../Model/Reaction.php';
 
 class PostController {
 
     private $postModel;
     private $userModel;
     private $commentModel;
+    private $reactionModel;
     
     public function __construct() {
         $this->postModel = new Post();
         $this->userModel = new User();
         $this->commentModel = new Comment();
+        $this->reactionModel = new Reaction();
     }
 
     public function lister(){
         $posts = $this->postModel->findAll();
+        $user_id = $_SESSION['id'] ?? null;
         
         foreach ($posts as $key => $post) {
             $user = $this->userModel->find($post['utilisateur_id']);
             $posts[$key]['nom_utilisateur'] = $user['nom'] ?? 'Utilisateur Inconnu';
             
             $posts[$key]['commentaires'] = $this->commentModel->findByPostId($post['id']);
+            
+            $posts[$key]['likes_count'] = $this->reactionModel->countByPostId($post['id']);
+            $posts[$key]['user_has_liked'] = $user_id ? $this->reactionModel->hasReacted($user_id, $post['id']) : false;
         }
 
         require_once __DIR__ . '/../Views/Post/lister.php';

@@ -5,10 +5,11 @@ session_start();
 require_once __DIR__ . '/../app/Controllers/UserController.php';
 require_once __DIR__ . '/../app/Controllers/PostController.php';
 require_once __DIR__ . '/../app/Controllers/CommentController.php';
+require_once __DIR__ . '/../app/Controllers/ReactionController.php';
 require_once __DIR__ . '/../app/Model/Post.php';
 require_once __DIR__ . '/../app/Model/User.php';
 require_once __DIR__ . '/../app/Model/Comment.php';
-
+require_once __DIR__ . '/../app/Model/Reaction.php';
 
 if(!isset($_GET['x']))
 require_once __DIR__ . '/../app/Views/Page/header.php';
@@ -26,13 +27,18 @@ switch ($controller) {
         $postModel = new Post();
         $userModel = new User();
         $commentModel = new Comment();
+        $reactionModel = new Reaction();
         $posts = $postModel->findAll();
+        $user_id = $_SESSION['id'] ?? null;
 
         foreach ($posts as $key => $post) {
             $user = $userModel->find($post['utilisateur_id']);
             $posts[$key]['nom_utilisateur'] = $user['nom'] ?? 'Utilisateur Inconnu';
             
             $posts[$key]['commentaires'] = $commentModel->findByPostId($post['id']); 
+
+            $posts[$key]['likes_count'] = $reactionModel->countByPostId($post['id']);
+            $posts[$key]['user_has_liked'] = $user_id ? $reactionModel->hasReacted($user_id, $post['id']) : false;
         }
         
         require_once __DIR__ . '/../app/Views/Page/home.php';
@@ -108,6 +114,15 @@ switch ($controller) {
         }
         break;
     
+    case 'Reaction':
+        $reactionController = new ReactionController();
+        switch ($action) {
+            case 'toggle':
+                $reactionController->toggleReaction();
+                break;
+        }
+        break;
+
     default:
         echo "Page non trouvée";
         break;

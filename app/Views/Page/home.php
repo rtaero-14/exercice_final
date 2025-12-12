@@ -35,6 +35,20 @@
                 <?php endif; ?>
 
                 <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <?php if (isset($_SESSION['id'])) : ?>
+                        <button class="btn btn-sm reaction-toggle" data-post-id="<?php echo $post['id']; ?>" data-liked="<?php echo $post['user_has_liked'] ? 'true' : 'false'; ?>">
+                            <i class="bi bi-heart-fill <?php echo $post['user_has_liked'] ? 'text-danger' : 'text-secondary'; ?>"></i> J'aime
+                        </button>
+                    <?php endif; ?>
+                    
+                    <span class="text-muted small">
+                        <span class="likes-count" data-post-id="<?php echo $post['id']; ?>"><?php echo $post['likes_count']; ?></span> J'aime
+                    </span>
+                </div>
+                
+                <hr>
                 
                 <h6 class="mb-3 text-muted" id="comment-count-<?php echo $post['id']; ?>">
                     <?php echo count($post['commentaires']); ?> commentaire(s)
@@ -191,6 +205,48 @@
                 .catch(error => {
                     console.error('Erreur de la requête Fetch:', error);
                     alert('Une erreur s\'est produite lors de la communication avec le serveur (Comment).');
+                });
+            });
+        });
+        
+        const reactionButtons = document.querySelectorAll('.reaction-toggle');
+        
+        reactionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = this.getAttribute('data-post-id');
+                const isLiked = this.getAttribute('data-liked') === 'true';
+                const icon = this.querySelector('i');
+                const countSpan = document.querySelector(`.likes-count[data-post-id="${postId}"]`);
+                
+                const formData = new FormData();
+                formData.append('post_id', postId);
+
+                fetch('?c=Reaction&a=toggle', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.action === 'liked') {
+                            button.setAttribute('data-liked', 'true');
+                            icon.classList.remove('text-secondary');
+                            icon.classList.add('text-danger');
+                        } else {
+                            button.setAttribute('data-liked', 'false');
+                            icon.classList.remove('text-danger');
+                            icon.classList.add('text-secondary');
+                        }
+                        
+                        countSpan.textContent = data.new_count;
+                        
+                    } else {
+                        alert('Erreur lors de la gestion de la réaction: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur de la requête Fetch réaction:', error);
+                    alert('Une erreur s\'est produite lors de la communication avec le serveur (Réaction).');
                 });
             });
         });

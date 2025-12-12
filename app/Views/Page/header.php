@@ -16,6 +16,8 @@ src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.j
 integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 crossorigin="anonymous"></script>
 
+<script src="/../../public/messages.js" defer></script>
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <ul class="navbar-nav">
         <li class="nav-item">

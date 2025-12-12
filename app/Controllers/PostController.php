@@ -19,11 +19,6 @@ class PostController {
         require_once __DIR__ . '/../Views/Post/creer_post.php';
     }
 
-    public function connexion() {
-        require_once __DIR__ . '/../Views/User/connexion.php';
-    }
-
-
     public function modifier() {
         if (!isset($_SESSION['id'])) {
             echo "Vous devez être connecté.";

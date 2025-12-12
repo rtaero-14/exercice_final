@@ -59,11 +59,6 @@ switch ($controller) {
             case 'profil':
                 $userController->profil();
                 break;
-                
-            // L'action 'update_profil' est retirée car on reste sur la méthode Bootstrap/PHP pour l'instant
-            // case 'update_profil':
-            //     $userController->updateProfilAjax();
-            //     break;
         }
         break;
         
@@ -83,7 +78,7 @@ switch ($controller) {
             case 'modifier':
                 $postController->modifier($id);
                 break;
-            case 'update': // NOUVELLE ROUTE POUR LA MISE À JOUR
+            case 'update':
                 $postController->update();
                 break;
             case 'supprimer':

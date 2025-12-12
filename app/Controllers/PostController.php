@@ -40,8 +40,8 @@ class PostController {
             return;
         }
 
-        $titre = $_POST['titre'] ?? '';
-        $contenu = $_POST['contenu'] ?? '';
+        $titre = trim($_POST['titre'] ?? '');
+        $contenu = trim($_POST['contenu'] ?? '');
         $utilisateur_id = $_SESSION['id'];
 
         if (empty($titre) || empty($contenu)) {
@@ -81,11 +81,17 @@ class PostController {
         }
         
         $id = $_POST['id'] ?? null;
-        $titre = $_POST['titre'] ?? '';
-        $contenu = $_POST['contenu'] ?? '';
+        $titre = trim($_POST['titre'] ?? '');
+        $contenu = trim($_POST['contenu'] ?? '');
         $utilisateur_id = $_SESSION['id'];
 
-        if (empty($id) || empty($titre) || empty($contenu)) {
+        if (empty($id)) {
+             $_SESSION['message']['danger'] = "Erreur de soumission : ID de post manquant.";
+             header('Location: ?c=Post&a=lister');
+             return;
+        }
+
+        if (empty($titre) || empty($contenu)) {
              $_SESSION['message']['danger'] = "Tous les champs sont obligatoires.";
              header('Location: ?c=Post&a=modifier&id=' . $id);
              return;

@@ -1,13 +1,13 @@
 <h1>Ceci est un réseau social !</h1>
 
 <p>
-    Vous voyez Instagram ? Bah c'est la même chose mais en moins bien<br/>
+    Vous voyez Instagram ? Bah c'est la même chose mais en moins bien, et pour une petite entreprise.<br/>
 </p>
 
 <hr>
 
 <?php if (empty($posts)) : ?>
-    <div class="alert alert-info">Aucun message n'a encore été publié. Soyez le premier !</div>
+    <div class="alert alert-info">Aucun post n'a encore été publié. Soyez le premier !</div>
 <?php endif; ?>
 
 <div class="row">

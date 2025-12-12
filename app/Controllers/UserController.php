@@ -66,4 +66,39 @@ class UserController {
         $user = $this->userModel->find($_SESSION['id']);
         require_once __DIR__ . '/../Views/User/profil.php';
     }
+    
+    public function updateProfilAjax() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['id'])) {
+            echo json_encode(['success' => false, 'message' => 'Non authentifié.']);
+            return;
+        }
+
+        $id = $_POST['id'] ?? null;
+        if ($id != $_SESSION['id']) {
+            echo json_encode(['success' => false, 'message' => 'Accès refusé.']);
+            return;
+        }
+
+        $nom = $_POST['nom'] ?? null;
+        $email = $_POST['email'] ?? null;
+        
+        if (!$nom || !$email) {
+            echo json_encode(['success' => false, 'message' => 'Le nom et l\'email sont requis.']);
+            return;
+        }
+        
+        $user = $this->userModel->find($id);
+        $passwordHash = $user['password'];
+
+        if ($this->userModel->update($id, $nom, $email, $passwordHash)) {
+            $_SESSION['nom'] = $nom;
+            $_SESSION['email'] = $email;
+            
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Échec de la mise à jour de la base de données.']);
+        }
+    }
 }

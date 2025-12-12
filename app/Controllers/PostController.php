@@ -1,21 +1,29 @@
 <?php
 
 require_once __DIR__ . '/../Model/Post.php';
+require_once __DIR__ . '/../Model/User.php';
 
 class PostController {
 
-    private $postModel; // Renommé en postModel pour plus de clarté
+    private $postModel;
+    private $userModel;
 
     public function __construct() {
         $this->postModel = new Post();
+        $this->userModel = new User();
     }
 
     public function lister(){
         $posts = $this->postModel->findAll();
+        
+        foreach ($posts as $key => $post) {
+            $user = $this->userModel->find($post['utilisateur_id']);
+            $posts[$key]['nom_utilisateur'] = $user['nom'] ?? 'Utilisateur Inconnu';
+        }
+
         require_once __DIR__ . '/../Views/Post/lister.php';
     }
 
-    // CORRECTION 4: Ajout de la méthode creer() pour afficher le formulaire
     public function creer() {
         if (!isset($_SESSION['id'])) {
             $_SESSION['message']['danger'] = "Vous devez être connecté pour créer un post.";
@@ -25,7 +33,6 @@ class PostController {
         require_once __DIR__ . '/../Views/Post/creer_post.php';
     }
 
-    // CORRECTION 4: Ajout de la méthode enregistrer() pour traiter le formulaire
     public function enregistrer() {
         if (!isset($_SESSION['id'])) {
             $_SESSION['message']['danger'] = "Vous devez être connecté pour enregistrer un post.";
@@ -51,18 +58,53 @@ class PostController {
 
     public function modifier($id) { 
         if (!isset($_SESSION['id'])) {
-            echo "Vous devez être connecté.";
+            $_SESSION['message']['danger'] = "Vous devez être connecté pour modifier un post.";
+            header('Location: ?c=User&a=connexion');
             return;
         }
 
         $post = $this->postModel->find($id);
-        if ($post['utilisateur_id'] != $_SESSION['id']) {
-            $_SESSION['message']['danger'] = "Vous ne pouvez pas modifier le post d'un autre utilisateur.";
+        if (!$post || $post['utilisateur_id'] != $_SESSION['id']) {
+            $_SESSION['message']['danger'] = "Accès refusé ou post non trouvé.";
             header('Location: ?c=Post&a=lister');
             return;
         }
 
         require_once __DIR__ . '/../Views/Post/modifier.php';        
+    }
+    
+    public function update() {
+        if (!isset($_SESSION['id'])) {
+            $_SESSION['message']['danger'] = "Vous devez être connecté pour modifier un post.";
+            header('Location: ?c=User&a=connexion');
+            return;
+        }
+        
+        $id = $_POST['id'] ?? null;
+        $titre = $_POST['titre'] ?? '';
+        $contenu = $_POST['contenu'] ?? '';
+        $utilisateur_id = $_SESSION['id'];
+
+        if (empty($id) || empty($titre) || empty($contenu)) {
+             $_SESSION['message']['danger'] = "Tous les champs sont obligatoires.";
+             header('Location: ?c=Post&a=modifier&id=' . $id);
+             return;
+        }
+        
+        $post = $this->postModel->find($id);
+        if (!$post || $post['utilisateur_id'] != $utilisateur_id) {
+            $_SESSION['message']['danger'] = "Tentative de modification non autorisée.";
+            header('Location: ?c=Post&a=lister');
+            return;
+        }
+
+        if ($this->postModel->update($id, $titre, $contenu, $utilisateur_id)) {
+            $_SESSION['message']['success'] = "Le post a été modifié avec succès.";
+        } else {
+            $_SESSION['message']['danger'] = "Erreur lors de la modification du post.";
+        }
+        
+        header('Location: ?c=Post&a=lister');
     }
 
     public function supprimer($id) {

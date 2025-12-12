@@ -5,6 +5,8 @@ session_start();
 require_once __DIR__ . '/../app/Controllers/UserController.php';
 require_once __DIR__ . '/../app/Controllers/PostController.php';
 require_once __DIR__ . '/../app/Controllers/CommentController.php';
+require_once __DIR__ . '/../app/Model/Post.php';
+require_once __DIR__ . '/../app/Model/User.php';
 
 if(!isset($_GET['x']))
 require_once __DIR__ . '/../app/Views/Page/header.php';
@@ -19,6 +21,15 @@ $id = isset($_GET['id']) ? $_GET['id'] : NULL;
 
 switch ($controller) {
     case 'home':
+        $postModel = new Post();
+        $userModel = new User();
+        $posts = $postModel->findAll();
+
+        foreach ($posts as $key => $post) {
+            $user = $userModel->find($post['utilisateur_id']);
+            $posts[$key]['nom_utilisateur'] = $user['nom'] ?? 'Utilisateur Inconnu';
+        }
+        
         require_once __DIR__ . '/../app/Views/Page/home.php';
         break;
     
@@ -48,6 +59,11 @@ switch ($controller) {
             case 'profil':
                 $userController->profil();
                 break;
+                
+            // L'action 'update_profil' est retirée car on reste sur la méthode Bootstrap/PHP pour l'instant
+            // case 'update_profil':
+            //     $userController->updateProfilAjax();
+            //     break;
         }
         break;
         
@@ -66,6 +82,9 @@ switch ($controller) {
                 break;
             case 'modifier':
                 $postController->modifier($id);
+                break;
+            case 'update': // NOUVELLE ROUTE POUR LA MISE À JOUR
+                $postController->update();
                 break;
             case 'supprimer':
                 $postController->supprimer($id);

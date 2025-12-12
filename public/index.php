@@ -6,13 +6,26 @@ require_once __DIR__ . '/../app/Controllers/UserController.php';
 require_once __DIR__ . '/../app/Controllers/PostController.php';
 require_once __DIR__ . '/../app/Controllers/CommentController.php';
 require_once __DIR__ . '/../app/Controllers/ReactionController.php';
+require_once __DIR__ . '/../app/Controllers/SearchController.php';
+require_once __DIR__ . '/../app/Controllers/NotificationController.php';
 require_once __DIR__ . '/../app/Model/Post.php';
 require_once __DIR__ . '/../app/Model/User.php';
 require_once __DIR__ . '/../app/Model/Comment.php';
 require_once __DIR__ . '/../app/Model/Reaction.php';
+require_once __DIR__ . '/../app/Model/Search.php';
+
 
 if(!isset($_GET['x']))
 require_once __DIR__ . '/../app/Views/Page/header.php';
+
+if(isset($_SESSION['message'])) :
+    foreach ($_SESSION['message'] as $type => $message) { ?>
+        <div class="alert alert-<?php echo $type; ?>">
+            <?php echo $message; ?>
+        </div>
+    <?php }
+    unset($_SESSION['message']);
+endif;
 
 if(!isset($_GET['c'])){
     $_GET['c'] = 'home';
@@ -119,6 +132,24 @@ switch ($controller) {
         switch ($action) {
             case 'toggle':
                 $reactionController->toggleReaction();
+                break;
+        }
+        break;
+    
+    case 'Search':
+        $searchController = new SearchController();
+        switch ($action) {
+            case 'ajaxSearch':
+                $searchController->ajaxSearch();
+                break;
+        }
+        break;
+    
+    case 'Notification':
+        $notificationController = new NotificationController();
+        switch ($action) {
+            case 'checkNewActivities':
+                $notificationController->checkNewActivities();
                 break;
         }
         break;

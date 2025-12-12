@@ -35,8 +35,8 @@ class UserController {
         $nom = $_POST['nom'];
         $password = $_POST['pwd'];
 
-        // Vérification du mdp et de l'identifiant
-        $user = $this->userModel->findBy(['nom' => $nom])[0];
+        $users = $this->userModel->findBy(['nom' => $nom]);
+        $user = $users ? $users[0] : null;
 
         if ($user && password_verify($password, $user['password'])){
             $_SESSION['id'] = $user['id'];
@@ -47,7 +47,8 @@ class UserController {
             header('Location: ?c=home');
         }
         else{
-            echo '<div>Identifiant ou mot de passe incorrect.</div>';
+            $_SESSION['message']['danger'] = "Identifiant ou mot de passe incorrect.";
+            header('Location: ?c=User&a=connexion');
         }
     }
 

@@ -11,7 +11,7 @@ class Post {
     }
 
     public function findAll() {
-        $query = "SELECT * FROM posts ORDER BY date_inscription DESC";
+        $query = "SELECT * FROM posts ORDER BY date_publication DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -55,7 +55,7 @@ class Post {
     }
 
     public function update($id, $titre, $contenu, $utilisateur_id) {
-        $query = "UPDATE users 
+        $query = "UPDATE posts 
                   SET titre = :titre, contenu = :contenu, utilisateur_id = :utilisateur_id
                   WHERE id = :id";
 
@@ -69,7 +69,7 @@ class Post {
     }
 
     public function delete($id) {
-        $query = "DELETE FROM users WHERE id = :id";
+        $query = "DELETE FROM posts WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();

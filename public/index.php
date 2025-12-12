@@ -13,12 +13,10 @@ if(!isset($_GET['c'])){
     $_GET['c'] = 'home';
 }
 
-// mise en place de la route actuelle
 $controller = isset($_GET['c']) ? $_GET['c'] : 'home';
 $action = isset($_GET['a']) ? $_GET['a'] : 'index';
 $id = isset($_GET['id']) ? $_GET['id'] : NULL;
 
-// définition des routes disponibles
 switch ($controller) {
     case 'home':
         require_once __DIR__ . '/../app/Views/Page/home.php';
@@ -53,7 +51,7 @@ switch ($controller) {
         }
         break;
         
-    case 'Post': // CORRECTION 3.1: Ajout du contrôleur Post
+    case 'Post':
         $postController = new PostController();
         switch ($action) {
             case 'lister':

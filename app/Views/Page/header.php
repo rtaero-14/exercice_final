@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Réseau Social Trop Cool</title>
-<!-- Bootstrap CSS and JS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 rel="stylesheet" integrity="sha384-
 QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-<!-- menu de navigation -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -17,7 +15,7 @@ QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="a
         </li>
         <?php if (isset($_SESSION['nom'])) { ?>
             <li class="nav-item">
-                <a class="nav-link" href="?c=Recettes&a=ajouter">Nouveau Post</a>
+                <a class="nav-link" href="?c=Post&a=creer">Nouveau Post</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="?c=User&a=profil">Profil de <?php echo $_SESSION['nom']?></a>
@@ -48,5 +46,4 @@ QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="a
     </div>
 <?php } endif; unset($_SESSION['message']); ?>
 
-<!-- corps de la page -->
 <div class="container w-75 m-auto">

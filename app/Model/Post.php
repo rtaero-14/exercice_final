@@ -42,7 +42,7 @@ class Post {
     }
 
     public function add($titre, $contenu, $utilisateur_id) {
-        $query = "INSERT INTO posts ($titre, $contenu, $utilisateur_id, date_inscription)
+        $query = "INSERT INTO posts (titre, contenu, utilisateur_id, date_publication)
                   VALUES (:titre, :contenu, :utilisateur_id, NOW())";
 
         $stmt = $this->conn->prepare($query);

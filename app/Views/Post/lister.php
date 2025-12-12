@@ -29,6 +29,20 @@
                 <?php endif; ?>
 
                 <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <?php if (isset($_SESSION['id'])) : ?>
+                        <button class="btn btn-sm reaction-toggle" data-post-id="<?php echo $post['id']; ?>" data-liked="<?php echo $post['user_has_liked'] ? 'true' : 'false'; ?>">
+                            <i class="bi bi-heart-fill <?php echo $post['user_has_liked'] ? 'text-danger' : 'text-secondary'; ?>"></i> J'aime
+                        </button>
+                    <?php endif; ?>
+                    
+                    <span class="text-muted small">
+                        <span class="likes-count" data-post-id="<?php echo $post['id']; ?>"><?php echo $post['likes_count']; ?></span> J'aime
+                    </span>
+                </div>
+                
+                <hr>
                 
                 <h6 class="mb-3 text-muted" id="comment-count-<?php echo $post['id']; ?>">
                     <?php echo count($post['commentaires']); ?> commentaire(s)
@@ -66,129 +80,3 @@
     </div>
     <?php endforeach; ?>
 </div>
-
-<?php if (isset($_SESSION['id'])) : ?>
-<script>
-    function updatePostAjax(element, type) {
-        const postId = element.getAttribute('data-id');
-        
-        const card = element.closest('.card');
-        const titreElement = card.querySelector('.post-titre-editable');
-        const contenuElement = card.querySelector('.post-contenu-editable');
-
-        const titre = titreElement.textContent.trim();
-        const contenu = contenuElement.textContent.trim();
-
-        const initialTitre = titreElement.getAttribute('data-initial-titre') || titre;
-        const initialContenu = contenuElement.getAttribute('data-initial-contenu') || contenu;
-
-        if (titre === initialTitre && contenu === initialContenu) {
-            return; 
-        }
-
-        const formData = new FormData();
-        formData.append('id', postId);
-        formData.append('titre', titre);
-        formData.append('contenu', contenu);
-
-        fetch('?c=Post&a=update', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok || response.status === 302) {
-                alert("Post modifié avec succès (rechargement requis pour voir le message de session).");
-            } else {
-                 alert("Erreur lors de la mise à jour du post.");
-            }
-        })
-        .catch(error => {
-            console.error('Erreur AJAX post update:', error);
-            alert('Une erreur s\'est produite lors de la communication avec le serveur (Post Update).');
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const editableElements = document.querySelectorAll('.post-titre-editable[contenteditable="true"], .post-contenu-editable[contenteditable="true"]');
-        
-        editableElements.forEach(element => {
-            if (element.classList.contains('post-titre-editable')) {
-                element.setAttribute('data-initial-titre', element.textContent.trim());
-            } else if (element.classList.contains('post-contenu-editable')) {
-                 element.setAttribute('data-initial-contenu', element.textContent.trim());
-            }
-            
-            element.addEventListener('blur', function() {
-                const type = element.classList.contains('post-titre-editable') ? 'titre' : 'contenu';
-                updatePostAjax(element, type);
-            });
-            
-            element.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey && element.classList.contains('post-titre-editable')) {
-                    e.preventDefault(); 
-                    element.blur(); 
-                }
-            });
-        });
-
-
-        const commentForms = document.querySelectorAll('.form-add-comment');
-
-        commentForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const postId = this.getAttribute('data-post-id');
-                const contentInput = this.querySelector('textarea[name="contenu"]');
-                const content = contentInput.value.trim();
-
-                if (content.length === 0) {
-                    alert('Le commentaire ne peut pas être vide.');
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('contenu', content);
-                formData.append('post_id', postId);
-
-                fetch('?c=Commentaires&a=ajouter', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        contentInput.value = '';
-                        
-                        const commentHtml = `
-                            <div class="card mb-2 p-2 bg-light comment-item" data-comment-id="${data.comment.id}">
-                                <p class="mb-0 small">
-                                    <strong>${data.comment.nom_utilisateur}</strong>: ${data.comment.contenu}
-                                </p>
-                                <span class="text-muted small">
-                                    ${new Date(data.comment.date_commentaire).toLocaleDateString()} ${new Date(data.comment.date_commentaire).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    - <a href="?c=Commentaires&a=supprimer&id=${data.comment.id}" class="text-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">Supprimer</a>
-                                </span>
-                            </div>
-                        `;
-                        
-                        const commentsList = document.getElementById('comments-list-' + postId);
-                        commentsList.insertAdjacentHTML('beforeend', commentHtml);
-                        
-                        const commentCountElement = document.getElementById('comment-count-' + postId);
-                        let currentCount = parseInt(commentCountElement.textContent.match(/\d+/)[0]);
-                        commentCountElement.textContent = (currentCount + 1) + ' commentaire(s)';
-                        
-                    } else {
-                        alert('Erreur lors de l\'ajout du commentaire: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur de la requête Fetch:', error);
-                    alert('Une erreur s\'est produite lors de la communication avec le serveur (Comment).');
-                });
-            });
-        });
-    });
-</script>
-<?php endif; ?>

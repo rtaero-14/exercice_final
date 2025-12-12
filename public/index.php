@@ -90,22 +90,18 @@ switch ($controller) {
         }
         break;
     
-        // case 'Commentaires':
-        //     $commentaireController = new CommentaireController();
-        //     switch ($action) {
-        //         case 'ajouter':
-        //             $commentaireController->ajouter($id);
-        //             break;
+    case 'Commentaires':
+        $commentaireController = new CommentController();
+        switch ($action) {
+            case 'ajouter':
+                $commentaireController->ajouter();
+                break;
 
-        //         case 'supprimer':
-        //             $commentaireController->supprimer($id);
-        //             break;
-
-        //         case 'listerTous':
-        //             $commentaireController->listerCommentaires();
-        //             break;
-        //     }
-        //     break;
+            case 'supprimer':
+                $commentaireController->supprimer($id);
+                break;
+        }
+        break;
     
     default:
         echo "Page non trouvée";

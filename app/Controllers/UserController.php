@@ -1,0 +1,68 @@
+<?php
+
+require_once __DIR__ . '/../Model/User.php';
+
+class UserController {
+
+    private $userModel;
+
+    public function __construct() {
+        $this->userModel = new User();
+    }
+
+    public function inscription() {
+        require_once __DIR__ . '/../Views/User/inscription.php';
+    }
+
+    public function enregistrer() {
+        $nom = $_POST['nom'];
+        $email = $_POST['email'];
+        $password = $_POST['pwd'];
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $this->userModel->add($nom, $email, $hashedPassword);
+
+        require_once __DIR__ . '/../Views/User/enregistrement.php';
+    }
+
+    public function connexion() {
+        require_once __DIR__ . '/../Views/User/connexion.php';
+    }
+
+    public function verifieConnexion(){
+
+        $nom = $_POST['nom'];
+        $password = $_POST['pwd'];
+
+        // Vérification du mdp et de l'identifiant
+        $user = $this->userModel->findBy(['nom' => $nom])[0];
+
+        if ($user && password_verify($password, $user['password'])){
+            $_SESSION['id'] = $user['id'];
+            $_SESSION['nom'] = $user['nom'];
+            $_SESSION['email'] = $user['email'];
+
+
+            header('Location: ?c=home');
+        }
+        else{
+            echo '<div>Identifiant ou mot de passe incorrect.</div>';
+        }
+    }
+
+    public function deconnexion() {
+        session_destroy();
+        header('Location: ?c=home');
+    }
+
+    public function profil() {
+        if (!isset($_SESSION['id'])) {
+            echo "Vous devez être connecté.";
+            return;
+        }
+
+        $user = $this->userModel->find($_SESSION['id']);
+        require_once __DIR__ . '/../Views/User/profil.php';
+    }
+}

@@ -10,45 +10,39 @@ class Comment {
         $this->conn = $database->getConnection();
     }
 
-    public function add($contenu, $utilisateur_id, $post_id) {
-        $query = "INSERT INTO comments (contenu, utilisateur_id, post_id, date_commentaire)
-                  VALUES (:contenu, :utilisateur_id, :post_id, NOW())";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':contenu', $contenu);
-        $stmt->bindParam(':utilisateur_id', $utilisateur_id);
+    public function create($post_id, $utilisateur_id, $contenu) {
+        $sql = "INSERT INTO comments (post_id, utilisateur_id, contenu) VALUES (:post_id, :utilisateur_id, :contenu)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':post_id', $post_id);
-
-        $stmt->execute();
+        $stmt->bindParam(':utilisateur_id', $utilisateur_id);
+        $stmt->bindParam(':contenu', $contenu);
+        return $stmt->execute();
+    }
+    
+    public function getLastInsertId() {
         return $this->conn->lastInsertId();
     }
 
     public function findByPostId($post_id) {
-        $query = "SELECT c.*, u.nom as nom_utilisateur 
-                  FROM comments c
-                  JOIN users u ON c.utilisateur_id = u.id
-                  WHERE c.post_id = :post_id
-                  ORDER BY c.date_commentaire ASC";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
+        $sql = "SELECT c.*, u.nom as nom_utilisateur FROM comments c JOIN users u ON c.utilisateur_id = u.id WHERE c.post_id = :post_id ORDER BY c.date_commentaire ASC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':post_id', $post_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+    
     public function find($id) {
-        $query = "SELECT * FROM comments WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $sql = "SELECT * FROM comments WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function delete($id) {
-        $query = "DELETE FROM comments WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
+        $sql = "DELETE FROM comments WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->rowCount() > 0;
+        return $stmt->execute();
     }
 }

@@ -4,12 +4,6 @@ require_once __DIR__ . '/../Model/Reaction.php';
 
 class ReactionController {
 
-    private $reactionModel;
-
-    public function __construct() {
-        $this->reactionModel = new Reaction();
-    }
-
     public function toggleReaction() {
         header('Content-Type: application/json');
 
@@ -26,15 +20,17 @@ class ReactionController {
             return;
         }
 
-        if ($this->reactionModel->hasReacted($utilisateur_id, $post_id)) {
-            $success = $this->reactionModel->delete($utilisateur_id, $post_id);
+        $reactionModel = new Reaction();
+
+        if ($reactionModel->hasReacted($utilisateur_id, $post_id)) {
+            $success = $reactionModel->delete($utilisateur_id, $post_id);
             $action = 'unliked';
         } else {
-            $success = $this->reactionModel->add($utilisateur_id, $post_id);
+            $success = $reactionModel->add($utilisateur_id, $post_id);
             $action = 'liked';
         }
 
-        $new_count = $this->reactionModel->countByPostId($post_id);
+        $new_count = $reactionModel->countByPostId($post_id);
 
         if ($success) {
             echo json_encode([

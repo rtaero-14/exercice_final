@@ -1,7 +1,7 @@
 <h1>Profil de l'utilisateur : <span id="profil_identifiant_titre"><?php echo $user['nom']; ?></span></h1>
 <div class="row">
     <div class="col">
-        <img class="w-75 rounded mx-auto img-fluid" src="<?php echo 'upload' . DIRECTORY_SEPARATOR . 'profil.png'; ?>" alt="<?php echo $user['nom']; ?>" class="card-img-top">
+        <img class="w-75 rounded mx-auto img-fluid" src="../upload/profil.png" alt="<?php echo $user['nom']; ?>" class="card-img-top">
     </div>
     <div class="col">
         <p><b>Nom :</b> <span id="profil_identifiant" data-id="<?php echo $user['id']; ?>" contenteditable="true"><?php echo $user['nom']; ?></span></p>

@@ -2,15 +2,18 @@
 
 require_once __DIR__ . '/../Model/Post.php';
 require_once __DIR__ . '/../Model/User.php';
+require_once __DIR__ . '/../Model/Comment.php';
 
 class PostController {
 
     private $postModel;
     private $userModel;
+    private $commentModel;
     
     public function __construct() {
         $this->postModel = new Post();
         $this->userModel = new User();
+        $this->commentModel = new Comment();
     }
 
     public function lister(){
@@ -19,6 +22,8 @@ class PostController {
         foreach ($posts as $key => $post) {
             $user = $this->userModel->find($post['utilisateur_id']);
             $posts[$key]['nom_utilisateur'] = $user['nom'] ?? 'Utilisateur Inconnu';
+            
+            $posts[$key]['commentaires'] = $this->commentModel->findByPostId($post['id']);
         }
 
         require_once __DIR__ . '/../Views/Post/lister.php';

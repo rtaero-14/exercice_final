@@ -7,6 +7,7 @@ require_once __DIR__ . '/../app/Controllers/PostController.php';
 require_once __DIR__ . '/../app/Controllers/CommentController.php';
 require_once __DIR__ . '/../app/Model/Post.php';
 require_once __DIR__ . '/../app/Model/User.php';
+require_once __DIR__ . '/../app/Model/Comment.php';
 
 if(!isset($_GET['x']))
 require_once __DIR__ . '/../app/Views/Page/header.php';
@@ -23,11 +24,14 @@ switch ($controller) {
     case 'home':
         $postModel = new Post();
         $userModel = new User();
+        $commentModel = new Comment();
         $posts = $postModel->findAll();
 
         foreach ($posts as $key => $post) {
             $user = $userModel->find($post['utilisateur_id']);
             $posts[$key]['nom_utilisateur'] = $user['nom'] ?? 'Utilisateur Inconnu';
+            
+            $posts[$key]['commentaires'] = $commentModel->findByPostId($post['id']); 
         }
         
         require_once __DIR__ . '/../app/Views/Page/home.php';

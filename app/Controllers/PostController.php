@@ -7,7 +7,7 @@ class PostController {
 
     private $postModel;
     private $userModel;
-
+    
     public function __construct() {
         $this->postModel = new Post();
         $this->userModel = new User();
